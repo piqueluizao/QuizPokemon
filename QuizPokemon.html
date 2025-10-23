@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desafio do Mestre Pokémon ⚡</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #ffcb05 0%, #3b4cca 80%);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-attachment: fixed;
+      overflow: hidden;
+    }
+    .quiz-container {
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid #ffcb05;
+      border-radius: 25px;
+      padding: 30px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 30px rgba(255, 203, 5, 0.5);
+      animation: fadeIn 0.8s ease;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #ffcb05;
+    }
+    #question {
+      font-size: 1.2em;
+      margin: 20px 0;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    button {
+      background: linear-gradient(90deg, #ffcb05, #ffee58);
+      border: none;
+      color: #3b4cca;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      font-size: 1em;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ffcb05;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    #feedback {
+      margin-top: 15px;
+      font-size: 1.1em;
+      min-height: 30px;
+      transition: all 0.3s;
+    }
+    #next-btn {
+      display: none;
+      margin-top: 25px;
+      background: linear-gradient(90deg, #3b4cca, #2a2c99);
+      color: #fff;
+      box-shadow: 0 0 10px #2a2c99;
+    }
+    #result-box {
+      text-align: center;
+      animation: fadeIn 0.8s ease;
+    }
+    #result-box h2 {
+      font-size: 1.8em;
+      text-shadow: 0 0 10px #ffcb05;
+    }
+    #result-box p {
+      font-size: 1.1em;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container" id="quiz-box">
+    <h1>⚡ Desafio do Mestre Pokémon ⚡</h1>
+    <p id="question"></p>
+    <div class="options" id="options"></div>
+    <p id="feedback"></p>
+    <button id="next-btn" onclick="nextQuestion()">Próxima Pergunta ➡</button>
+  </div>
+
+  <script>
+    const quiz = [
+      {q: 'Qual é o Pokémon número 25 da Pokédex?', options: ['Charmander', 'Bulbasaur', 'Eevee', 'Pikachu'], answer: 3},
+      {q: 'Que tipo de Pokémon é o Squirtle?', options: ['Planta', 'Fogo', 'Água', 'Terra'], answer: 2},
+      {q: 'Quem é o professor da região de Kanto?', options: ['Professor Nogueira', 'Professor Carvalho', 'Professor Rowan', 'Professor Oakley'], answer: 1},
+      {q: 'Qual é a evolução de Eevee com Pedra da Água?', options: ['Leafeon', 'Vaporeon', 'Glaceon', 'Jolteon'], answer: 1},
+      {q: 'Qual é o tipo duplo de Lucario?', options: ['Lutador/Fogo', 'Psíquico/Aço', 'Lutador/Aço', 'Fantasma/Lutador'], answer: 2},
+      {q: 'Em qual região se passa Pokémon Sun e Moon?', options: ['Kanto', 'Galar', 'Alola', 'Kalos'], answer: 2},
+      {q: 'Qual é o Pokémon lendário que aparece em Pokémon Silver?', options: ['Ho-Oh', 'Lugia', 'Rayquaza', 'Dialga'], answer: 1},
+      {q: 'Qual é o ataque elétrico mais famoso do Pikachu?', options: ['Choque do Trovão', 'Raio Solar', 'Ataque Rápido', 'Explosão de Fumaça'], answer: 0}
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionElement = document.getElementById('question');
+    const optionsElement = document.getElementById('options');
+    const feedbackElement = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    const quizBox = document.getElementById('quiz-box');
+
+    function loadQuestion() {
+      const q = quiz[currentQuestion];
+      questionElement.textContent = q.q;
+      optionsElement.innerHTML = '';
+      feedbackElement.textContent = '';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(i);
+        optionsElement.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const q = quiz[currentQuestion];
+      const correct = selected === q.answer;
+      const buttons = optionsElement.querySelectorAll('button');
+      buttons.forEach((b, i) => {
+        b.disabled = true;
+        if (i === q.answer) b.style.background = 'linear-gradient(90deg, #4CAF50, #81C784)';
+        else if (i === selected) b.style.background = 'linear-gradient(90deg, #E53935, #EF5350)';
+      });
+
+      if (correct) {
+        feedbackElement.textContent = '✅ Correto!';
+        score++;
+      } else {
+        feedbackElement.textContent = `❌ Errado! Resposta certa: ${q.options[q.answer]}`;
+      }
+      nextBtn.style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      nextBtn.style.display = 'none';
+      if (currentQuestion < quiz.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      quizBox.innerHTML = `
+        <div id="result-box">
+          <h2>🏆 Resultado Final 🏆</h2>
+          <p>Você acertou <strong>${score}</strong> de <strong>${quiz.length}</strong> perguntas!</p>
+          <p>${getEndingMessage(score)}</p>
+          <button onclick="window.location.reload()">🔁 Jogar Novamente</button>
+        </div>
+      `;
+    }
+
+    function getEndingMessage(score) {
+      const total = quiz.length;
+      if (score === total) {
+        return '✨ Incrível! Você é um verdadeiro MESTRE POKÉMON! ⚡';
+      } else if (score >= total * 0.7) {
+        return '🔥 Excelente! Está muito perto de ser um mestre!';
+      } else if (score >= total * 0.4) {
+        return '⚙️ Bom esforço! Mas ainda há ginásios a conquistar!';
+      } else {
+        return '💤 Parece que você dormiu no Centro Pokémon... Tente novamente!';
+      }
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
